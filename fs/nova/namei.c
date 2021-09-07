@@ -133,7 +133,7 @@ static int nova_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 	struct super_block *sb = dir->i_sb;
 	struct nova_inode *pidir, *pi;
 	struct nova_inode_update update;
-	u64 pi_addr = 0;
+	u64 pi_addr = 0; 
 	u64 ino, epoch_id;
 	INIT_TIMING(create_time);
 
@@ -144,13 +144,13 @@ static int nova_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 		goto out_err;
 
 	epoch_id = nova_get_epoch_id(sb);
-	ino = nova_new_nova_inode(sb, &pi_addr);
+	ino = nova_new_nova_inode(sb, &pi_addr); /* selects and initializes an unused inode in the inode table */
 	if (ino == 0)
 		goto out_err;
 
 	update.tail = 0;
 	update.alter_tail = 0;
-	err = nova_add_dentry(dentry, ino, 0, &update, epoch_id);
+	err = nova_add_dentry(dentry, ino, 0, &update, epoch_id); /* appends a create dentry of 'dir_name' to the directory’s log. */
 	if (err)
 		goto out_err;
 
@@ -165,8 +165,8 @@ static int nova_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 	unlock_new_inode(inode);
 
 	pi = nova_get_block(sb, pi_addr);
-	nova_lite_transaction_for_new_inode(sb, pi, pidir, inode, dir,
-						&update);
+	nova_lite_transaction_for_new_inode(sb, pi, pidir, inode, dir, /* uses the current CPU’s journal to atomically */
+						&update); 								   /* update the directory’s log tail and set the valid bit of the new inode. */
 	NOVA_END_TIMING(create_t, create_time);
 	return err;
 out_err:
@@ -901,15 +901,15 @@ struct dentry *nova_get_parent(struct dentry *child)
 }
 
 const struct inode_operations nova_dir_inode_operations = {
-	.create		= nova_create,
-	.lookup		= nova_lookup,
-	.link		= nova_link,
-	.unlink		= nova_unlink,
-	.symlink	= nova_symlink,
-	.mkdir		= nova_mkdir,
-	.rmdir		= nova_rmdir,
-	.mknod		= nova_mknod,
-	.rename		= nova_rename,
+	.create		= nova_create, // add dentry
+	.lookup		= nova_lookup, // find dentry
+	.link		= nova_link, // add dentry
+	.unlink		= nova_unlink, // remove dentry
+	.symlink	= nova_symlink, // add dentry
+	.mkdir		= nova_mkdir, // add dentry
+	.rmdir		= nova_rmdir, // remove dentry
+	.mknod		= nova_mknod, // add dentry
+	.rename		= nova_rename, // add dentry, remove dentry
 	.setattr	= nova_notify_change,
 	.get_acl	= NULL,
 };

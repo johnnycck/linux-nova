@@ -61,7 +61,7 @@ int nova_insert_dir_tree(struct super_block *sb,
 		return -ENOMEM;
 
 	node->hash = hash;
-	node->direntry = direntry;
+	node->direntry = direntry; /* adds the file to the directory’s radix tree in DRAM. */
 	ret = nova_insert_range_node(&sih->rb_tree, node, NODE_DIR);
 	if (ret) {
 		nova_free_dir_node(node);

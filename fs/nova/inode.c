@@ -1013,6 +1013,7 @@ int nova_delete_dead_inode(struct super_block *sb, u64 ino)
 }
 
 /* Returns 0 on failure */
+/* selects and initializes an unused inode in the inode table */
 u64 nova_new_nova_inode(struct super_block *sb, u64 *pi_addr)
 {
 	struct nova_sb_info *sbi = NOVA_SB(sb);
