@@ -44,6 +44,7 @@ static ino_t nova_inode_by_name(struct inode *dir, struct qstr *entry,
 	return direntryc->ino;
 }
 
+/* Searches a directory for an inode corresponding to the filename included in a dentry object. */
 static struct dentry *nova_lookup(struct inode *dir, struct dentry *dentry,
 				   unsigned int flags)
 {
@@ -115,7 +116,7 @@ static void nova_lite_transaction_for_new_inode(struct super_block *sb,
 	}
 	NOVA_END_TIMING(create_trans_t, trans_time);
 }
-
+/* Creates a new disk inode for a regular file associated with a dentry object in some directory. */
 /* Returns new tail after append */
 /*
  * By the time this is called, we already have created
@@ -175,6 +176,10 @@ out_err:
 	return err;
 }
 
+/* Creates a new disk inode for a special file associated with a dentry object in some directory. The
+ * mode and rdev parameters specify, respectively, the file type and the device's major and minor
+ * numbers.
+ */
 static int nova_mknod(struct inode *dir, struct dentry *dentry, umode_t mode,
 		       dev_t rdev)
 {
@@ -227,6 +232,7 @@ out_err:
 	return err;
 }
 
+/* Creates a new inode for a symbolic link associated with a dentry object in some directory. */
 static int nova_symlink(struct inode *dir, struct dentry *dentry,
 			 const char *symname)
 {
@@ -343,6 +349,9 @@ static void nova_lite_transaction_for_time_and_link(struct super_block *sb,
 	NOVA_END_TIMING(link_trans_t, trans_time);
 }
 
+/* Creates a new hard link that refers to the file specified by old_dentry in the directory dir; the
+ * new hard link has the name specified by new_dentry.
+ */
 static int nova_link(struct dentry *dest_dentry, struct inode *dir,
 		      struct dentry *dentry)
 {
@@ -407,7 +416,7 @@ out:
 	NOVA_END_TIMING(link_t, link_time);
 	return err;
 }
-
+/* Removes the hard link of the file specified by a dentry object from a directory. */
 static int nova_unlink(struct inode *dir, struct dentry *dentry)
 {
 	struct inode *inode = dentry->d_inode;
@@ -468,6 +477,7 @@ out:
 	return retval;
 }
 
+/* Creates a new inode for a directory associated with a dentry object in some directory. */
 static int nova_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode)
 {
 	struct super_block *sb = dir->i_sb;
@@ -576,6 +586,7 @@ static int nova_empty_dir(struct inode *inode)
 	return 1;
 }
 
+/* Removes from a directory the subdirectory whose name is included in a dentry object. */
 static int nova_rmdir(struct inode *dir, struct dentry *dentry)
 {
 	struct inode *inode = dentry->d_inode;
@@ -652,6 +663,9 @@ end_rmdir:
 	return err;
 }
 
+/* Moves the file identified by old_entry from the old_dir directory to the new_dir one. The
+ * new filename is included in the dentry object that new_dentry points to.
+ */
 static int nova_rename(struct inode *old_dir,
 			struct dentry *old_dentry,
 			struct inode *new_dir, struct dentry *new_dentry,

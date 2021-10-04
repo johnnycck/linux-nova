@@ -1273,6 +1273,7 @@ static void nova_setsize(struct inode *inode, loff_t oldsize, loff_t newsize,
 	NOVA_END_TIMING(setsize_t, setsize_time);
 }
 
+/* Used by some filesystems to read inode attributes. */
 int nova_getattr(const struct path *path, struct kstat *stat,
 		 u32 request_mask, unsigned int query_flags)
 {
@@ -1296,6 +1297,7 @@ int nova_getattr(const struct path *path, struct kstat *stat,
 	return 0;
 }
 
+/* Notifies a "change event" after touching the inode attributes. */
 int nova_notify_change(struct dentry *dentry, struct iattr *attr)
 {
 	struct inode *inode = dentry->d_inode;

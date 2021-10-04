@@ -95,7 +95,9 @@ static int nova_readlink_copy(char __user *buffer, int buflen, const char *link)
 out:
 	return len;
 }
-
+/* Copies into a User Mode memory area specified by buffer the file pathname corresponding to the
+ * symbolic link specified by the dentry.
+ */
 static int nova_readlink(struct dentry *dentry, char __user *buffer, int buflen)
 {
 	struct nova_file_write_entry *entry;
