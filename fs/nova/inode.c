@@ -1182,6 +1182,10 @@ fail2:
 	return ERR_PTR(errval);
 }
 
+/* Updates a filesystem inode with the contents of the inode object passed as the parameter; the i_ino
+ * field of the inode object identifies the filesystem inode on disk that is concerned. The flag parameter
+ * indicates whether the I/O operation should be synchronous.
+ */
 int nova_write_inode(struct inode *inode, struct writeback_control *wbc)
 {
 	/* write_inode should never be called because we always keep our inodes
@@ -1191,6 +1195,7 @@ int nova_write_inode(struct inode *inode, struct writeback_control *wbc)
 	return 0;
 }
 
+/* Invoked when the inode is marked as modified (dirty). */
 /*
  * dirty_inode() is called from mark_inode_dirty_sync()
  * usually dirty_inode should not be called because NOVA always keeps its inodes

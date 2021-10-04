@@ -839,6 +839,7 @@ out:
 	return retval;
 }
 
+/* Returns statistics on a filesystem by filling the buf buffer. */
 int nova_statfs(struct dentry *d, struct kstatfs *buf)
 {
 	struct super_block *sb = d->d_sb;
@@ -857,6 +858,7 @@ int nova_statfs(struct dentry *d, struct kstatfs *buf)
 	return 0;
 }
 
+/* Used to display the filesystem-specific options */
 static int nova_show_options(struct seq_file *seq, struct dentry *root)
 {
 	struct nova_sb_info *sbi = NOVA_SB(root->d_sb);
@@ -886,7 +888,7 @@ static int nova_show_options(struct seq_file *seq, struct dentry *root)
 
 	return 0;
 }
-
+/* Remounts the filesystem with new options (invoked when a mount option must be changed). */
 int nova_remount(struct super_block *sb, int *mntflags, char *data)
 {
 	unsigned long old_sb_flags;
@@ -919,7 +921,9 @@ restore_opt:
 	mutex_unlock(&sbi->s_lock);
 	return ret;
 }
-
+/* Releases the superblock object passed as the parameter 
+ * (because the corresponding filesystem is unmounted).
+ */
 static void nova_put_super(struct super_block *sb)
 {
 	struct nova_sb_info *sbi = NOVA_SB(sb);
@@ -1032,7 +1036,7 @@ struct vma_item *nova_alloc_vma_item(struct super_block *sb)
 	return (struct vma_item *)nova_alloc_range_node(sb);
 }
 
-
+/* Allocates space for an inode object, including the space required for filesystem-specific data. */
 static struct inode *nova_alloc_inode(struct super_block *sb)
 {
 	struct nova_inode_info *vi;
@@ -1055,6 +1059,7 @@ static void nova_i_callback(struct rcu_head *head)
 	kmem_cache_free(nova_inode_cachep, vi);
 }
 
+/* Destroys an inode object, including the filesystem-specific data. */
 static void nova_destroy_inode(struct inode *inode)
 {
 	nova_dbgv("%s: %lu\n", __func__, inode->i_ino);
