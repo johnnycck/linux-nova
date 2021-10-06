@@ -21,6 +21,10 @@
 #include "nova.h"
 #include "inode.h"
 
+/* Similar to the ioctl method, but it does not take the big kernel lock.
+ * It is expected that all device drivers and all filesystems will implement
+ * this new method instead of the ioctl method.
+ */
 long nova_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	struct address_space *mapping = filp->f_mapping;
@@ -162,6 +166,7 @@ setversion_out:
 	}
 }
 
+/* Method used to implement the ioctl() 32-bit system call by 64-bit kernels. */
 #ifdef CONFIG_COMPAT
 long nova_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {

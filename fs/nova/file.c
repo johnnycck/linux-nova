@@ -71,6 +71,7 @@ hint_set:
 	return 0;
 }
 
+/* Updates the file pointer. */
 static loff_t nova_llseek(struct file *file, loff_t offset, int origin)
 {
 	struct inode *inode = file->f_path.dentry->d_inode;
@@ -112,6 +113,7 @@ static loff_t nova_llseek(struct file *file, loff_t offset, int origin)
 	return offset;
 }
 
+/* Flushes the file by writing all cached data to disk. */
 /* This function is called by both msync() and fsync().
  * TODO: Check if we can avoid calling nova_flush_buffer() for fsync. We use
  * movnti to write data to files, so we may want to avoid doing unnecessary
@@ -157,6 +159,9 @@ persist:
 	return ret;
 }
 
+/* Called when a reference to an open file is closed. The actual purpose of this method is
+ * filesystem-dependent.
+ */
 /* This callback is called when a file is closed */
 static int nova_flush(struct file *file, fl_owner_t id)
 {
@@ -164,6 +169,7 @@ static int nova_flush(struct file *file, fl_owner_t id)
 	return 0;
 }
 
+/* Opens a file by creating a new file object and linking it to the corresponding inode object */
 static int nova_open(struct inode *inode, struct file *filp)
 {
 	return generic_file_open(inode, filp);
@@ -366,6 +372,9 @@ static struct iomap_ops nova_iomap_ops_nolock = {
 	.iomap_end	= nova_iomap_end,
 };
 
+/* Starts an asynchronous I/O operation to read len bytes into buf from file position pos (introduced
+ * to support the io_submit( ) system call).
+ */
 static ssize_t nova_dax_read_iter(struct kiocb *iocb, struct iov_iter *to)
 {
 	struct inode *inode = iocb->ki_filp->f_mapping->host;
@@ -409,6 +418,7 @@ static int nova_update_iter_csum_parity(struct super_block *sb,
 	return 0;
 }
 
+/* Starts an asynchronous I/O operation to write len bytes from buf to file position pos. */
 static ssize_t nova_dax_write_iter(struct kiocb *iocb, struct iov_iter *from)
 {
 	struct file *file = iocb->ki_filp;
@@ -594,7 +604,9 @@ out:
 	nova_dbgv("%s returned %zu\n", __func__, copied);
 	return copied ? copied : error;
 }
-
+/* Reads count bytes from a file starting at position *offset; the value *offset (which usually
+ * corresponds to the file pointer) is then increased.
+ */
 /*
  * Wrappers. We need to use the rcu read lock to avoid
  * concurrent truncate operation. No problem for write because we held
@@ -864,7 +876,9 @@ ssize_t nova_cow_file_write(struct file *filp,
 	return ret;
 }
 
-
+/* Writes count bytes into a file starting at position *offset; the value *offset (which usually
+ * corresponds to the file pointer) is then increased.
+ */
 static ssize_t nova_dax_file_write(struct file *filp, const char __user *buf,
 				   size_t len, loff_t *ppos)
 {
@@ -890,6 +904,7 @@ static ssize_t do_nova_dax_file_write(struct file *filp, const char __user *buf,
 }
 
 
+/* Performs a memory mapping of the file into a process address space */
 static int nova_dax_file_mmap(struct file *file, struct vm_area_struct *vma)
 {
 	struct inode *inode = file->f_mapping->host;
